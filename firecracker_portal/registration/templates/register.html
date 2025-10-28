@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Firecracker Stall Registration</title>
+  </head>
+  <body>
+    <h2>Register for Firecracker Stall</h2>
+
+    {% if messages %} {% for message in messages %}
+    <p style="color: red">{{ message }}</p>
+    {% endfor %} {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <label for="full_name">Full Name:</label><br />
+      <input type="text" id="full_name" name="full_name" required /><br /><br />
+
+      <label for="email">Email ID:</label><br />
+      <input type="email" id="email" name="email" required /><br /><br />
+
+      {% if otp_sent %}
+      <label for="otp">Enter OTP:</label><br />
+      <input
+        type="text"
+        id="otp"
+        name="otp"
+        maxlength="6"
+        required
+      /><br /><br />
+      {% endif %}
+
+      <button type="submit">
+        {% if otp_sent %}Verify OTP{% else %}Send OTP{% endif %}
+      </button>
+    </form>
+  </body>
+</html>
