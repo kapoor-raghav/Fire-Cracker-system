@@ -1,8 +1,15 @@
 # registration/forms.py
 from django import forms
-from .models import UserProfile
+from .models import CustomUserProfile
+from .models import StallApplication
+from django.contrib.auth.forms import UserCreationForm
 
-class RegistrationForm(forms.ModelForm):
+class StallApplicationForm(forms.ModelForm):
     class Meta:
-        model = UserProfile
-        fields = ['full_name', 'email']
+        model = StallApplication
+        fields = ['stall_name', 'location', 'description']        
+
+class CustomUserRegistrationForm(UserCreationForm):
+    class Meta:
+        model = CustomUserProfile
+        fields = ['first_name', 'last_name', 'email']

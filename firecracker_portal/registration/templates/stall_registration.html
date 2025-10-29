@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stall Registration</title>
+  </head>
+  <body>
+    <h2>Register Your Firecracker Stall</h2>
+
+    {% if messages %} {% for message in messages %}
+    <p style="color: green">{{ message }}</p>
+    {% endfor %} {% endif %}
+
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <input type="submit" value="Submit Stall" />
+    </form>
+  </body>
+</html>
