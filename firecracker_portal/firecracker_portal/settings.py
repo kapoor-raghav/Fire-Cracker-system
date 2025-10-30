@@ -123,6 +123,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For testing
 LOGIN_URL = '/register/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 SESSION_COOKIE_AGE= 5*60
 SESSION_COOKIE_SECURE= True

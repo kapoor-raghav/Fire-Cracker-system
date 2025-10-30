@@ -12,9 +12,7 @@
     />
 
     <!-- Bootstrap 5 JS Bundle (optional) -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </head>
   <body class="bg-light">
     <div class="container py-5">
@@ -22,9 +20,7 @@
         <div class="col-md-6">
           <div class="card shadow-sm">
             <div class="card-body">
-              <h4 class="card-title mb-4 text-center">
-                Register for Firecracker Stall
-              </h4>
+              <h4 class="card-title mb-4 text-center">DC Login</h4>
 
               {% if messages %} {% for message in messages %}
               <div class="alert alert-danger py-2" role="alert">
@@ -34,30 +30,6 @@
 
               <form method="post" novalidate>
                 {% csrf_token %} {% if not otp_sent %}
-                <div class="mb-3">
-                  <label for="first_name" class="form-label">First Name</label>
-                  <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    required
-                    class="form-control"
-                    value="{{ request.session.first_name|default:'' }}"
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label for="last_name" class="form-label">Last Name</label>
-                  <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    required
-                    class="form-control"
-                    value="{{ request.session.last_name|default:'' }}"
-                  />
-                </div>
-
                 <div class="mb-3">
                   <label for="email" class="form-label">Email ID</label>
                   <input

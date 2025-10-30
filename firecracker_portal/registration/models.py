@@ -33,6 +33,9 @@ class StallApplication(models.Model):
         ('Rejected', 'Rejected')
     ], default='Pending')
 
+   # PDF upload field
+    document = models.FileField(upload_to='documents/', blank=True, null=True)
+
 
 
     def __str__(self):

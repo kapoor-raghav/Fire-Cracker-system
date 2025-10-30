@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DC Dashboard</title>
+  </head>
+  <body>
+
+    <h2 class='text-center mt-3'>District Commissioner Dashboard</h2>
+
+    <!-- Add Bootstrap 5 CSS before the DataTables CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+
+    <div class="container mt-4">
+      <table 
+        id="applications-table" 
+        class="table table-striped table-bordered" 
+        style="width:100%"
+    >
+      <thead>
+        <tr>
+          <th>Stall Name</th>
+          <th>Location</th>
+          <th>Description</th>
+          <th>User</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td>{{ app.stall_name }}</td>
+          <td>{{ app.location }}</td>
+          <td>{{ app.description }}</td>
+          <td>{{ app.user.email }}</td>
+          <td>{{ app.status }}</td>
+          <td>
+            {% if app.status == 'Pending' %}
+            <a class="btn btn-sm btn-success" href="{% url 'approve_application' app.id %}">Approve</a>
+            <a class="btn btn-sm btn-danger"  href="{% url 'reject_application' app.id %}">Reject</a>
+            {% else %} {{ app.status }} {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- DataTables CSS/JS (CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        $("#applications-table").DataTable({
+          pageLength: 10,
+          lengthMenu: [
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"],
+          ],
+          columnDefs: [
+            { orderable: false, targets: -1 }, // disable ordering on Actions column
+          ],
+        });
+      });
+    </script>
+  </body>
+</html>
