@@ -35,10 +35,19 @@ class StallApplication(models.Model):
 
    # PDF upload field
     document = models.FileField(upload_to='documents/', blank=True, null=True)
+#  Departmental review fields
+    dc_comment = models.TextField(blank=True, null=True)
+    dc_approval_doc = models.FileField(upload_to='approvals/dc/', blank=True, null=True)
 
+    hod_fire_comment = models.TextField(blank=True, null=True)
+    hod_fire_approval_doc = models.FileField(upload_to='approvals/fire/', blank=True, null=True)
 
+    hod_redcross_comment = models.TextField(blank=True, null=True)
+    hod_redcross_approval_doc = models.FileField(upload_to='approvals/redcross/', blank=True, null=True)
+
+    hod_police_comment = models.TextField(blank=True, null=True)
+    hod_police_approval_doc = models.FileField(upload_to='approvals/police/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.stall_name} ({self.user.email})"
-
 

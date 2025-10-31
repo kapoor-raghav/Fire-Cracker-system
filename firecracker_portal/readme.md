@@ -1,5 +1,5 @@
-# Work flow for the fire cracking system 
-![alt text](fire.png)
+# Work flow for the firecracker stall registration system 
+![alt text](week1.png)
 
 # N.O.C Approval Workflow
 
@@ -41,5 +41,6 @@ User fills out and submits:
 - Consolidates approvals from all departments.  
 - Sends the final status or approval back to **D.C**.
 
-## 6.  
+
+
 

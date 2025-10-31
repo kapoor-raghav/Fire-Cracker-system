@@ -17,5 +17,6 @@ urlpatterns = [
     path('dc/approve/<int:app_id>/', views.approve_application, name='approve_application'),
     path('dc/reject/<int:app_id>/', views.reject_application, name='reject_application'),
     path('unauthorized/', TemplateView.as_view(template_name='unauthorized.html'), name='unauthorized'),
-
+    path('hod/login', views.hod_login, name='hod_login'),
+    path('hod/dashboard', views.hod_dashboard, name='hod_dashboard')
 ]
