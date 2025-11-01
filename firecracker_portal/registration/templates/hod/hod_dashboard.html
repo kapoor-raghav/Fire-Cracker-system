@@ -26,8 +26,9 @@
           <th>Description</th>
           <th>User</th>
           <th>Status</th>
-          <th>Actions</th>
+          <th>Process</th>
           <th>Document</th>
+          <th>Submitted At</th>
         </tr>
       </thead>
       <tbody>
@@ -39,17 +40,17 @@
           <td>{{ app.user.email }}</td>
           <td>{{ app.status }}</td>
           <td>
-            {% if app.status == 'Pending' %}
-            {% comment %} change this code {% endcomment %}
-            <a class="btn btn-sm btn-success" href="{% url 'approve_application' app.id %}">Approve</a>
-            <a class="btn btn-sm btn-danger"  href="{% url 'reject_application' app.id %}">Reject</a>
-            {% comment %}  {% endcomment %}
-            {% else %} {{ app.status }} {% endif %}
+            <a class="btn btn-sm btn-warning" href="{% url 'process_application' app.id %}">Process Application</a>
+          </td>
           <td>
             {% if app.document %}
             <a class="btn btn-sm btn-primary mt-1" href="{{ app.document.url }}" target="_blank">View Document</a>
             {% endif %}
             </td>
+          <td>
+            {% if app.status == 'Pending' %}
+            {{ app.submitted_at|date:"d M Y, h:i A" }}
+            {% else %} {{ app.status }} {% endif %}
           </td>
         </tr>
         {% endfor %}

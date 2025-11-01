@@ -18,5 +18,7 @@ urlpatterns = [
     path('dc/reject/<int:app_id>/', views.reject_application, name='reject_application'),
     path('unauthorized/', TemplateView.as_view(template_name='unauthorized.html'), name='unauthorized'),
     path('hod/login', views.hod_login, name='hod_login'),
-    path('hod/dashboard', views.hod_dashboard, name='hod_dashboard')
+    path('hod/dashboard', views.hod_dashboard, name='hod_dashboard'),
+    path('process/application/<int:app_id>/', views.process_application, name='process_application'),
+
 ]

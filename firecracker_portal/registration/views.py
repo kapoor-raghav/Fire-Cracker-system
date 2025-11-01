@@ -8,7 +8,7 @@ from datetime import timedelta
 import random
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .forms import StallApplicationForm, FireDepartmentReviewForm
+from .forms import StallApplicationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
@@ -16,6 +16,18 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import StallApplication 
 from django.urls import reverse
+
+def get_role(username, roles=['HOD_FIRE', 'HOD_POLICE', 'HOD_REDCROSS']):
+    try:
+        profile = CustomUserProfile.objects.get(username=username)
+    except CustomUserProfile.DoesNotExist:
+        return redirect('hod_login')
+    
+    if profile.role not in roles:
+        return redirect('unauthorized')  # Create a simple unauthorized page
+    return [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+
+
 @login_required
 def dc_dashboard(request):
     profile = None
@@ -32,17 +44,9 @@ def dc_dashboard(request):
 
 @login_required
 def hod_dashboard(request):
-    profile = None
-    try:
-        profile = CustomUserProfile.objects.get(username=request.user)
-    except CustomUserProfile.DoesNotExist:
-        return redirect('hod_login')
-    
-    if profile.role not in ['HOD_FIRE', 'HOD_POLICE']:
-        return redirect('unauthorized')  # Create a simple unauthorized page
-    role = [full_name for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+    (role,full_name) = get_role(request.user)
     applications = StallApplication.objects.all().order_by('-submitted_at')
-    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':role})
+    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':full_name})
 
 @login_required
 def approve_application(request, app_id):
@@ -295,5 +299,39 @@ def hod_login(request):
                     fail_silently=False,
                 )
                 messages.info(request, "OTP sent to your email.")
-                otp_sent = True 
+                otp_sent = True
+
     return render(request, 'hod/hod_login.html', {'otp_sent': otp_sent, 'user':user})
+
+@login_required
+def process_application(request, app_id):
+    application = get_object_or_404(StallApplication, id=app_id)
+    user = request.user
+    (role, full_name) = get_role(user)
+    # Map role to fields
+    role_fields = {
+        'DC': ('dc_comment', 'dc_approval_doc', 'dc_status'),
+        'HOD_FIRE': ('hod_fire_comment', 'hod_fire_approval_doc', 'hod_fire_status'),
+        'HOD_REDCROSS': ('hod_redcross_comment', 'hod_redcross_approval_doc', 'hod_redcross_status'),
+        'HOD_POLICE': ('hod_police_comment', 'hod_police_approval_doc', 'hod_police_status'),
+    }
+
+    comment_field, doc_field, status_field = role_fields[role]
+
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        approval_doc = request.FILES.get('approval_doc')
+        status = request.POST.get('status')
+        setattr(application, comment_field, comment)
+        setattr(application, status_field, status)
+        if approval_doc:
+            setattr(application, doc_field, approval_doc)
+
+        application.save()
+        messages.success(request, "Review submitted successfully.")
+        return redirect('hod_dashboard')  # or role-specific dashboard
+
+    return render(request, 'hod/process_application.html', {
+        'application': application,
+        'role': full_name
+    })
