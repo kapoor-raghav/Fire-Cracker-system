@@ -27,6 +27,60 @@ def get_role(username, roles=['HOD_FIRE', 'HOD_POLICE', 'HOD_REDCROSS']):
         return redirect('unauthorized')  # Create a simple unauthorized page
     return [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
 
+@login_required
+def dc_fresh_requests(request):
+    profile = CustomUserProfile.objects.get(username=request.user)
+    if profile.role != 'DC':
+        return redirect('unauthorized')
+
+    applications = StallApplication.objects.filter(
+        status='Fresh'
+    ).order_by('-submitted_at')
+
+    print(applications)
+    return render(request, 'dc/dc_fresh_requests.html', {
+        'applications': applications,
+        'role': 'DC',
+        'dashboard_type': 'Fresh Requests'
+    })
+
+@login_required
+def dc_pending_requests(request):
+    profile = CustomUserProfile.objects.get(username=request.user)
+    if profile.role != 'DC':
+        return redirect('unauthorized')
+
+    applications = StallApplication.objects.filter(
+        status='Pending'
+    ).order_by('-submitted_at')
+
+    return render(request, 'dc/dc_pending_requests.html', {
+        'applications': applications,
+        'role': 'DC',
+        'dashboard_type': 'Pending Requests'
+    })
+
+@login_required
+def dc_finalize_requests(request):
+    profile = CustomUserProfile.objects.get(username=request.user)
+    if profile.role != 'DC':
+        return redirect('unauthorized')
+
+    applications = StallApplication.objects.filter(
+        hod_fire_approval_doc__isnull=False,
+        hod_police_approval_doc__isnull=False,
+        hod_redcross_approval_doc__isnull=False,
+        hod_fire_status='Verified',
+        hod_police_status="Verified",
+        hod_redcross_status="Verified",
+        status='Pending'
+    ).order_by('-submitted_at')
+
+    return render(request, 'dc/dc_finalize_request.html', {
+        'applications': applications,
+        'role': 'DC',
+        'dashboard_type': 'Finalize Requests'
+    })
 
 @login_required
 def dc_dashboard(request):

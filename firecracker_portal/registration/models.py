@@ -23,6 +23,7 @@ class CustomUserProfile(User):
 # registration/models.py
 class StallApplication(models.Model):
     STATUS_CHOICES = [
+        ('Fresh','Fresh'),
         ('Pending', 'Pending'),
         ('Verified', 'Verified'),
         ('Rejected', 'Rejected')
@@ -32,7 +33,7 @@ class StallApplication(models.Model):
     location = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Fresh')
 
 # PDF upload field
     document = models.FileField(upload_to='documents/', blank=True, null=True)
