@@ -16,28 +16,29 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import StallApplication 
 from django.urls import reverse
+from .decorators import role_required
 
-def get_role(username, roles=['HOD_FIRE', 'HOD_POLICE', 'HOD_REDCROSS']):
-    try:
-        profile = CustomUserProfile.objects.get(username=username)
-    except CustomUserProfile.DoesNotExist:
-        return redirect('hod_login')
-    
-    if profile.role not in roles:
-        return redirect('unauthorized')  # Create a simple unauthorized page
-    return [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+HOD_DEPARTMENTS = ['HOD_FIRE', 'HOD_REDCROSS', 'HOD_POLICE']
+
+'''
+    DC Based Views
+'''
+@login_required
+@role_required(['DC'])
+def dc_forward_application(request, app_id):
+    application = get_object_or_404(StallApplication, id=app_id)
+    application.status="Pending"
+    application.save()
+    messages.success(request, "Application forwarded to all HODs")
+    return redirect('dc_fresh_requests')
 
 @login_required
+@role_required(['DC'])
 def dc_fresh_requests(request):
-    profile = CustomUserProfile.objects.get(username=request.user)
-    if profile.role != 'DC':
-        return redirect('unauthorized')
-
     applications = StallApplication.objects.filter(
         status='Fresh'
     ).order_by('-submitted_at')
 
-    print(applications)
     return render(request, 'dc/dc_fresh_requests.html', {
         'applications': applications,
         'role': 'DC',
@@ -45,11 +46,8 @@ def dc_fresh_requests(request):
     })
 
 @login_required
+@role_required(['DC'])
 def dc_pending_requests(request):
-    profile = CustomUserProfile.objects.get(username=request.user)
-    if profile.role != 'DC':
-        return redirect('unauthorized')
-
     applications = StallApplication.objects.filter(
         status='Pending'
     ).order_by('-submitted_at')
@@ -61,11 +59,8 @@ def dc_pending_requests(request):
     })
 
 @login_required
+@role_required(['DC'])
 def dc_finalize_requests(request):
-    profile = CustomUserProfile.objects.get(username=request.user)
-    if profile.role != 'DC':
-        return redirect('unauthorized')
-
     applications = StallApplication.objects.filter(
         hod_fire_approval_doc__isnull=False,
         hod_police_approval_doc__isnull=False,
@@ -83,26 +78,14 @@ def dc_finalize_requests(request):
     })
 
 @login_required
+@role_required(['DC'])
 def dc_dashboard(request):
-    profile = None
-    try:
-        profile = CustomUserProfile.objects.get(username=request.user)
-    except CustomUserProfile.DoesNotExist:
-        return redirect('dc_login')
-    
-    if profile.role != 'DC':
-        return redirect('unauthorized')  # Create a simple unauthorized page
-    
     applications = StallApplication.objects.all().order_by('-submitted_at')
     return render(request, 'dc/dc_dashboard.html', {'applications': applications})
 
-@login_required
-def hod_dashboard(request):
-    (role,full_name) = get_role(request.user)
-    applications = StallApplication.objects.all().order_by('-submitted_at')
-    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':full_name})
 
 @login_required
+@role_required(['DC'])
 def approve_application(request, app_id):
     app = get_object_or_404(StallApplication, id=app_id)
     app.status = 'Verified'
@@ -110,11 +93,13 @@ def approve_application(request, app_id):
     return redirect('dc_dashboard')
 
 @login_required
+@role_required(['DC'])
 def reject_application(request, app_id):
     app = get_object_or_404(StallApplication, id=app_id)
     app.status = 'Rejected'
     app.save()
     return redirect('dc_dashboard')
+
 
 @login_required
 def stall_registration(request):
@@ -129,7 +114,6 @@ def stall_registration(request):
     else:
         form = StallApplicationForm()
     return render(request, 'stall_registration.html', {'form': form})
-
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -357,11 +341,27 @@ def hod_login(request):
 
     return render(request, 'hod/hod_login.html', {'otp_sent': otp_sent, 'user':user})
 
+'''
+    2. HOD Based Views
+'''
 @login_required
+@role_required(HOD_DEPARTMENTS)
+def hod_dashboard(request):
+    try:
+        profile = CustomUserProfile.objects.get(username=request.user)
+        role, full_name = [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+    except:
+        return redirect('unauthorized')
+    applications = StallApplication.objects.all().order_by('-submitted_at')
+    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':full_name})
+
+@login_required
+@role_required(HOD_DEPARTMENTS)
 def process_application(request, app_id):
     application = get_object_or_404(StallApplication, id=app_id)
     user = request.user
-    (role, full_name) = get_role(user)
+    profile = CustomUserProfile.objects.get(username=user)
+    (role, full_name) = [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
     # Map role to fields
     role_fields = {
         'DC': ('dc_comment', 'dc_approval_doc', 'dc_status'),

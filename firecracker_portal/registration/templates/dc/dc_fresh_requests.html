@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block content %}
+{% extends "dc_base.html" %} {% block content %}
 <div class="container mt-5">
   <h2 class="text-center mb-4">DC Dashboard – Fresh Requests</h2>
 
@@ -32,8 +32,8 @@
         <td>
           <a
             class="btn btn-sm btn-warning"
-            href="{% url 'process_application' app.id %}"
-            >Process</a
+            href="{% url 'dc_forward_application' app.id %}"
+            >Process Application</a
           >
         </td>
         <td>{{ app.submitted_at|date:"d M Y, h:i A" }}</td>

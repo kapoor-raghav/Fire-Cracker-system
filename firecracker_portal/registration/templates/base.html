@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,42 +34,30 @@
     {% block extra_css %}{% endblock %}
   </head>
   <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a class="navbar-brand" href="/">Fire Cracker Portal</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <div class="text-center my-4">
-              <a
-                href="{% url 'dc_fresh_requests' %}"
-                class="btn btn-outline-primary me-2 {% if dashboard_type == 'Fresh Requests' %}active{% endif %}"
-                >Fresh Requests</a
-              >
-              <a
-                href="{% url 'dc_pending_requests' %}"
-                class="btn btn-outline-warning me-2 {% if dashboard_type == 'Pending Requests' %}active{% endif %}"
-                >Pending Requests</a
-              >
-              <a
-                href="{% url 'dc_finalize_requests' %}"
-                class="btn btn-outline-success {% if dashboard_type == 'Finalize Requests' %}active{% endif %}"
-                >Finalize Requests</a
-              >
-            </div>
-          </ul>
-        </div>
-      </div>
-    </nav>
+  
+    {% block nav %}{% endblock nav %}
 
+    {% if messages %}
+      <div class="container mt-3">
+        {% for message in messages %}
+          {% if 'error' in message.tags %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          {% elif 'warning' in message.tags %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          {% elif 'success' in message.tags %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {% elif 'info' in message.tags %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {% else %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+          {% endif %}
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
     <!-- Main Content -->
     <div class="container main-content">{% block content %}{% endblock %}</div>
 

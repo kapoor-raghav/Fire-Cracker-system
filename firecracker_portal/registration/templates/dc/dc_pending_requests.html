@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block content %}
+{% extends "dc_base.html" %} {% block content %}
 <div class="container mt-5">
   <h2 class="text-center mb-4">DC Dashboard – Pending Requests</h2>
 
@@ -39,7 +39,6 @@
           <span class="badge bg-success">Verified</span>
           {% else %}<span class="badge bg-warning text-dark">Pending</span>
           {% endif %}        
-
         </td>
 
         <td>{{ app.submitted_at|date:"d M Y, h:i A" }}</td>
