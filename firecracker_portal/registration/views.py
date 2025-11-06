@@ -80,6 +80,7 @@ def dc_finalize_requests(request):
 @login_required
 @role_required(['DC'])
 def dc_dashboard(request):
+    print(request.user)
     applications = StallApplication.objects.all().order_by('-submitted_at')
     return render(request, 'dc/dc_dashboard.html', {'applications': applications})
 
@@ -116,7 +117,8 @@ def stall_registration(request):
     return render(request, 'stall_registration.html', {'form': form})
 
 def generate_otp():
-    return str(random.randint(100000, 999999))
+    return "000000"
+    # return str(random.randint(100000, 999999))
 
 def register_user(request):
     otp_sent = False
@@ -344,6 +346,7 @@ def hod_login(request):
 '''
     2. HOD Based Views
 '''
+
 @login_required
 @role_required(HOD_DEPARTMENTS)
 def hod_dashboard(request):
@@ -355,6 +358,45 @@ def hod_dashboard(request):
     applications = StallApplication.objects.all().order_by('-submitted_at')
     return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':full_name})
 
+@login_required
+@role_required(HOD_DEPARTMENTS)
+def hod_fresh_requests(request):
+    user = request.user
+    user = get_object_or_404(CustomUserProfile, id=request.user.id)
+    role = user.role
+    field = role.lower() + '_status'
+    applications = StallApplication.objects.filter(
+            status='Pending', 
+            # **(Double-star) can be used to put variable as a key, instead of fixed key inside the model
+            **{field: "Pending"}            
+            ).order_by('-submitted_at')
+    
+    return render(request, 'hod/hod_fresh.html', {
+        'applications': applications,
+        'role': 'HOD',
+        'dashboard_type': 'Fresh Requests'
+    })
+
+@login_required
+@role_required(HOD_DEPARTMENTS)
+def hod_processed_requests(request):
+    user = request.user
+    user = get_object_or_404(CustomUserProfile, id=request.user.id)
+    role = user.role
+    field = role.lower() + '_status'
+    applications = StallApplication.objects.filter(
+            status='Pending', 
+            # **(Double-star) can be used to put variable as a key, instead of fixed key inside the model
+            **{field + '__in': ["Approved", "Rejected"]}            
+            ).order_by('-submitted_at')
+    
+    return render(request, 'hod/hod_processed.html', {
+        'applications': applications,
+        'role': 'HOD',
+        'dashboard_type': 'Processed Requests'
+    })
+
+    
 @login_required
 @role_required(HOD_DEPARTMENTS)
 def process_application(request, app_id):

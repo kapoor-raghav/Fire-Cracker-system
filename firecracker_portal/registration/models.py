@@ -18,7 +18,6 @@ class CustomUserProfile(User):
     is_verified = models.BooleanField(default=False)
     failed_attempts = models.IntegerField(default=0)
     is_locked = models.BooleanField(default=False)
-
     
 # registration/models.py
 class StallApplication(models.Model):

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block nav %}
+  <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">Fire Cracker Portal</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <div class="text-center my-4">
+              <a
+                href="{% url 'hod_fresh_requests' %}"
+                class="btn btn-outline-primary me-2 {% if dashboard_type == 'Fresh Requests' %}active{% endif %}"
+                >Fresh Requests</a
+              >
+              <a
+                href="{% url 'hod_processed_requests' %}"
+                class="btn btn-outline-warning me-2 {% if dashboard_type == 'Pending Requests' %}active{% endif %}"
+                >Processed Requests</a
+              >
+            </div>
+          </ul>
+        </div>
+      </div>
+    </nav>
+{% endblock nav %}
+{% block content %}
+{% endblock content%}

@@ -1,5 +1,7 @@
 {% extends "hod_base.html" %}
 {% block content %}
+    <h2 class="text-center">{{dashboard_type}}</h2>
+
     <div class="container mt-4">
       <table 
         id="applications-table" 
@@ -26,9 +28,8 @@
           <td>{{ app.description }}</td>
           <td>{{ app.user.email }}</td>
           <td>{{ app.status }}</td>
-          <td>
-            <a class="btn btn-sm btn-warning" href="{% url 'process_application' app.id %}">Process Application</a>
-          </td>
+          <td>            <a class="btn btn-sm btn-warning" href="{% url 'process_application' app.id %}">Process Application</a>
+</td>
           <td>
             {% if app.document %}
             <a class="btn btn-sm btn-primary mt-1" href="{{ app.document.url }}" target="_blank">View Document</a>

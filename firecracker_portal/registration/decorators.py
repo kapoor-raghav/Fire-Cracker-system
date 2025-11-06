@@ -1,6 +1,8 @@
 from functools import wraps
 from django.shortcuts import redirect
 from django.contrib import messages
+from .models import CustomUserProfile
+from django.shortcuts import get_object_or_404
 
 def role_required(allowed_roles):
     def decorator(view_func):
@@ -10,7 +12,7 @@ def role_required(allowed_roles):
             if not user.is_authenticated:
                 messages.error(request, "You must be logged in.")
                 return redirect('unauthorized')
-
+            user = get_object_or_404(CustomUserProfile, id=user.id)
             role = getattr(user, 'role', None)
             if role not in allowed_roles:
                 messages.error(request, "You do not have permission to access this page.")

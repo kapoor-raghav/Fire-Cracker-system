@@ -19,6 +19,8 @@ urlpatterns = [
     path('unauthorized/', TemplateView.as_view(template_name='unauthorized.html'), name='unauthorized'),
     path('hod/login', views.hod_login, name='hod_login'),
     path('hod/dashboard', views.hod_dashboard, name='hod_dashboard'),
+     path('hod/dashboard/fresh/', views.hod_fresh_requests, name='hod_fresh_requests'),
+    path('hod/dashboard/processed/', views.hod_processed_requests, name='hod_processed_requests'),
     path('process/application/<int:app_id>/', views.process_application, name='process_application'),
     path('forward/application/<int:app_id>/', views.dc_forward_application, name='dc_forward_application'),
     path('dc/dashboard/fresh/', views.dc_fresh_requests, name='dc_fresh_requests'),
