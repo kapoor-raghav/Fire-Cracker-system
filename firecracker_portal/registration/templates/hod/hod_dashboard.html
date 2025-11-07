@@ -1,5 +1,6 @@
 {% extends "hod_base.html" %}
 {% block content %}
+    <h2 class="text-center">{{role_full_name}} Dashboard</h2>
     <div class="container mt-4">
       <table 
         id="applications-table" 
@@ -12,8 +13,8 @@
           <th>Location</th>
           <th>Description</th>
           <th>User</th>
-          <th>Status</th>
-          <th>Process</th>
+          <th>DC Status</th>
+          <th>HOD Status</th>
           <th>Document</th>
           <th>Submitted At</th>
         </tr>
@@ -25,10 +26,16 @@
           <td>{{ app.location }}</td>
           <td>{{ app.description }}</td>
           <td>{{ app.user.email }}</td>
-          <td>{{ app.status }}</td>
-          <td>
-            <a class="btn btn-sm btn-warning" href="{% url 'process_application' app.id %}">Process Application</a>
-          </td>
+            <td>{% if app.status %}{{ app.status }}{% else %}Error{% endif %}</td>
+            <td>
+            {% if role == 'HOD_POLICE' %}
+              {% if app.hod_police_status %}{{ app.hod_police_status }}{% else %}Pending{% endif %}
+            {% elif role == 'HOD_FIRE' %}
+              {% if app.hod_fire_status %}{{ app.hod_fire_status }}{% else %}Pending{% endif %}
+            {% elif role == 'HOD_REDCROSS' %}
+              {% if app.hod_redcross_status %}{{ app.hod_redcross_status }}{% else %}Pending{% endif %}
+            {% endif %}
+            </td>
           <td>
             {% if app.document %}
             <a class="btn btn-sm btn-primary mt-1" href="{{ app.document.url }}" target="_blank">View Document</a>

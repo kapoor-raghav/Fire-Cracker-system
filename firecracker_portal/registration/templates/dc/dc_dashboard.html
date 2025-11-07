@@ -11,8 +11,8 @@
         <th>Stall Name</th>
         <th>Location</th>
         <th>Description</th>
+        <th>Status</th>
         <th>Document</th>
-        <th>Action</th>
         <th>Submitted At</th>
       </tr>
     </thead>
@@ -22,6 +22,7 @@
         <td>{{ app.stall_name }}</td>
         <td>{{ app.location }}</td>
         <td>{{ app.description }}</td>
+        <td>{{ app.status }}</td>
         <td>
           {% if app.document %}
           <a
@@ -31,14 +32,6 @@
             >View Document</a
           >
           {% endif %}
-        </td>
-
-        <td>
-          <a
-            class="btn btn-sm btn-warning"
-            href="{% url 'process_application' app.id %}"
-            >Process Application</a
-          >
         </td>
         <td>{{ app.submitted_at|date:"d M Y, h:i A" }}</td>
       </tr>

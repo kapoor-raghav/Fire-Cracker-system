@@ -21,21 +21,21 @@
         <td>{{ app.location }}</td>
         <td>{{ app.user.email }}</td>
         <td>
-          {% if app.hod_fire_status == "Verified" %}<span
+          {% if app.hod_fire_status == "Approved" and app.hod_fire_approval_doc %}<span
             class="badge bg-success"
             >Verified</span
           >{% else %}<span class="badge bg-warning text-dark">Pending</span>
           {% endif %}
         </td>
         <td>
-          {% if app.hod_police_status == "Verified" %}<span
+          {% if app.hod_police_status == "Approved" and app.hod_police_approval_doc %}<span
             class="badge bg-success"
             >Verified</span
           >{% else %}<span class="badge bg-warning text-dark">Pending</span>
           {% endif %}
         </td>
         <td>
-          {% if app.hod_redcross_status == "Verified" and app.hod_redcross_approval_doc %} 
+          {% if app.hod_redcross_status == "Approved" and app.hod_redcross_approval_doc %} 
           <span class="badge bg-success">Verified</span>
           {% else %}<span class="badge bg-warning text-dark">Pending</span>
           {% endif %}        

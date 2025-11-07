@@ -65,9 +65,9 @@ def dc_finalize_requests(request):
         hod_fire_approval_doc__isnull=False,
         hod_police_approval_doc__isnull=False,
         hod_redcross_approval_doc__isnull=False,
-        hod_fire_status='Verified',
-        hod_police_status="Verified",
-        hod_redcross_status="Verified",
+        hod_fire_status__in=["Approved", "Rejected"],       
+        hod_police_status__in=["Approved", "Rejected"],        
+        hod_redcross_status__in=["Approved", "Rejected"],        
         status='Pending'
     ).order_by('-submitted_at')
 
@@ -83,24 +83,6 @@ def dc_dashboard(request):
     print(request.user)
     applications = StallApplication.objects.all().order_by('-submitted_at')
     return render(request, 'dc/dc_dashboard.html', {'applications': applications})
-
-
-@login_required
-@role_required(['DC'])
-def approve_application(request, app_id):
-    app = get_object_or_404(StallApplication, id=app_id)
-    app.status = 'Verified'
-    app.save()
-    return redirect('dc_dashboard')
-
-@login_required
-@role_required(['DC'])
-def reject_application(request, app_id):
-    app = get_object_or_404(StallApplication, id=app_id)
-    app.status = 'Rejected'
-    app.save()
-    return redirect('dc_dashboard')
-
 
 @login_required
 def stall_registration(request):
@@ -356,24 +338,22 @@ def hod_dashboard(request):
     except:
         return redirect('unauthorized')
     applications = StallApplication.objects.all().order_by('-submitted_at')
-    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role':full_name})
+    return render(request, 'hod/hod_dashboard.html', {'applications': applications, 'role_full_name':full_name, 'role':role})
 
 @login_required
 @role_required(HOD_DEPARTMENTS)
 def hod_fresh_requests(request):
-    user = request.user
     user = get_object_or_404(CustomUserProfile, id=request.user.id)
     role = user.role
     field = role.lower() + '_status'
     applications = StallApplication.objects.filter(
-            status='Pending', 
-            # **(Double-star) can be used to put variable as a key, instead of fixed key inside the model
-            **{field: "Pending"}            
-            ).order_by('-submitted_at')
+        status='Pending',  # Only show applications forwarded by DC
+        **{field: 'Pending'}  # Only show applications not yet processed by this HOD
+    ).order_by('-submitted_at')
     
     return render(request, 'hod/hod_fresh.html', {
         'applications': applications,
-        'role': 'HOD',
+        'role': role,  # Pass actual role instead of hardcoded 'HOD'
         'dashboard_type': 'Fresh Requests'
     })
 
@@ -392,13 +372,13 @@ def hod_processed_requests(request):
     
     return render(request, 'hod/hod_processed.html', {
         'applications': applications,
-        'role': 'HOD',
+        'role': role,
         'dashboard_type': 'Processed Requests'
     })
 
     
 @login_required
-@role_required(HOD_DEPARTMENTS)
+@role_required(HOD_DEPARTMENTS + ['DC'])
 def process_application(request, app_id):
     application = get_object_or_404(StallApplication, id=app_id)
     user = request.user
@@ -415,9 +395,22 @@ def process_application(request, app_id):
     comment_field, doc_field, status_field = role_fields[role]
 
     if request.method == 'POST':
+        # Check if application is in pending state
+        if application.status != 'Pending':
+            return redirect('hod_dashboard')
+            
         comment = request.POST.get('comment')
         approval_doc = request.FILES.get('approval_doc')
         status = request.POST.get('status')
+        
+        # Get the current role's status field
+        current_status = getattr(application, status_field)
+        
+        # Only allow processing if status is Pending
+        if current_status != 'Pending':
+
+            return redirect('hod_dashboard')
+            
         setattr(application, comment_field, comment)
         setattr(application, status_field, status)
         if approval_doc:
@@ -425,9 +418,35 @@ def process_application(request, app_id):
 
         application.save()
         messages.success(request, "Review submitted successfully.")
-        return redirect('hod_dashboard')  # or role-specific dashboard
+        return redirect('hod_dashboard')
 
     return render(request, 'hod/process_application.html', {
         'application': application,
-        'role': full_name
+        'role': full_name,
+        'actual_role':role
+    })
+
+@login_required
+@role_required(['DC'])
+def dc_process_application(request, app_id):
+    application = get_object_or_404(StallApplication, id=app_id)
+    user = request.user
+    profile = CustomUserProfile.objects.get(username=user)
+    (role, full_name) = [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+
+    if request.method == 'POST':            
+        comment = request.POST.get('comment')
+        approval_doc = request.FILES.get('approval_doc')
+        status = request.POST.get('status')
+        application.status = status
+        application.dc_approval_doc = approval_doc
+        application.dc_comment = comment
+        application.save()
+        messages.success(request, "Application processed successfully.")
+        return redirect('dc_dashboard')
+
+    return render(request, 'dc/dc_process_application.html', {
+        'application': application,
+        'role': full_name,
+        'actual_role':role
     })

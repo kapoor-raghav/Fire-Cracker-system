@@ -24,7 +24,7 @@ class StallApplication(models.Model):
     STATUS_CHOICES = [
         ('Fresh','Fresh'),
         ('Pending', 'Pending'),
-        ('Verified', 'Verified'),
+        ('Accepted', 'Accepted'),
         ('Rejected', 'Rejected')
     ]
     user = models.ForeignKey(CustomUserProfile, on_delete=models.CASCADE)

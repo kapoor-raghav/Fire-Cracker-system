@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Process Application</title>
+    <title>DC Process Application</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -36,16 +36,13 @@
         <div class="card-header">{{ role }} Review Section</div>
         <div class="card-body">
           {% if actual_role == 'DC' %}
-          {% if application.dc_approval_doc  %}
+          {% comment %} {% if application.dc_approval_doc  %}
             <p>
-              <p>
-            <strong>Previously Uploaded N.O.C:</strong>
             <a href="{{ application.dc_approval_doc.url }}" target="_blank"
               >View PDF</a
             >
           </p>
-            </p>
-          {% endif %}
+          {% endif %} {% endcomment %}
           <div class="d-flex gap-2">
             {% if application.hod_fire_approval_doc %}
             <a href="{{ application.hod_fire_approval_doc.url }}" target="_blank" class="btn btn-danger flex-fill">
@@ -63,35 +60,6 @@
             </a>
             {% endif %}
           </div>
-          {% elif actual_role == 'HOD_FIRE' and application.hod_fire_approval_doc %}
-          <p>
-            <strong>Previously Uploaded N.O.C:</strong>
-            <a
-              href="{{ application.hod_fire_approval_doc.url }}"
-              target="_blank"
-              >View PDF</a
-            >
-          </p>
-          {% elif actual_role == 'HOD_REDCROSS' and
-          application.hod_redcross_approval_doc %}
-          <p>
-            <strong>Previously Uploaded N.O.C:</strong>
-            <a
-              href="{{ application.hod_redcross_approval_doc.url }}"
-              target="_blank"
-              >View PDF</a
-            >
-          </p>
-          {% elif actual_role == 'HOD_POLICE' and application.hod_police_approval_doc
-          %}
-          <p>
-            <strong>Previously Uploaded N.O.C:</strong>
-            <a
-              href="{{ application.hod_police_approval_doc.url }}"
-              target="_blank"
-              >View PDF</a
-            >
-          </p>
           {% endif %}
 
           <form method="post" enctype="multipart/form-data">
@@ -146,7 +114,7 @@
                 required
               />
             </div>
-            <button type="submit" class="btn btn-success">Submit N.O.C</button>
+            <button type="submit" class="btn btn-success">Final Approval</button>
           </form>
         </div>
       </div>
