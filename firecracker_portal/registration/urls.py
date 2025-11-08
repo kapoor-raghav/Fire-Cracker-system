@@ -3,8 +3,6 @@ from django.urls import path
 from django.views.generic import RedirectView
 from . import views
 from django.views.generic import TemplateView
-from django.conf import settings
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('register/', views.register_user, name='register'),
@@ -23,5 +21,6 @@ urlpatterns = [
     path('dc/dashboard/fresh/', views.dc_fresh_requests, name='dc_fresh_requests'),
     path('dc/dashboard/pending/', views.dc_pending_requests, name='dc_pending_requests'),
     path('dc/dashboard/finalize/', views.dc_finalize_requests, name='dc_finalize_requests'),
-
+    path('dc/dashboard/processed/', views.dc_processed_requests, name='dc_processed_requests'),
+    path('logout/', views.user_logout, name='logout'),
 ]

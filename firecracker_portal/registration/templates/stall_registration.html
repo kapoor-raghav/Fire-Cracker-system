@@ -1,35 +1,53 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Stall Registration</title>
-    <link rel="stylesheet" href="{% static 'registration/register.css' %}" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        padding: 20px;
-      }
-      .container {
-        max-width: 600px;
-      }
-      form {
-        margin-top: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Register Your Firecracker Stall</h2>
-
-    {% if messages %} {% for message in messages %}
-    <p style="color: green">{{ message }}</p>
-    {% endfor %} {% endif %}
-
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %} {{ form.as_p }}
-      <button type="submit">Submit Stall</button>
-    </form>
-  </body>
-</html>
+{% block nav %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="/">Fire Cracker Portal</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            
+          </ul>
+           </ul>
+           <!-- Right Side Logout Button -->
+          <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+          </li>
+        </ul>
+        </div>
+      </div>
+    </nav>
+{% endblock nav %}
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="text-center mb-0">Register Your Firecracker Stall</h2>
+          </div>
+          <div class="card-body">
+             <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="mb-3">
+                {{ form.as_p|safe }}
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit Stall</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

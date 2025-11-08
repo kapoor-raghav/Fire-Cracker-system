@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import StallApplicationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.shortcuts import get_object_or_404
 # registration/views.py
 from django.contrib.auth.decorators import login_required
@@ -23,6 +23,30 @@ HOD_DEPARTMENTS = ['HOD_FIRE', 'HOD_REDCROSS', 'HOD_POLICE']
 '''
     DC Based Views
 '''
+@login_required
+def user_logout(request):
+    """
+    Logs out the current user and redirects to the correct login page
+    based on their role (DC or HOD).
+    """
+    # Get role before logging out
+    user = get_object_or_404(CustomUserProfile, id=request.user.id)
+    role = user.role
+    print(role)
+
+    # Perform logout
+    logout(request)
+
+    # Redirect based on role
+    if role == 'DC':
+        return redirect('dc_login')
+    elif role in HOD_DEPARTMENTS:
+        return redirect('hod_login')
+    else:
+        # Fallback: send to a generic unauthorized or home page
+        return redirect('register')
+
+
 @login_required
 @role_required(['DC'])
 def dc_forward_application(request, app_id):
@@ -76,6 +100,25 @@ def dc_finalize_requests(request):
         'role': 'DC',
         'dashboard_type': 'Finalize Requests'
     })
+@login_required
+@role_required(['DC'])
+def dc_processed_requests(request):
+    applications = StallApplication.objects.filter(
+        hod_fire_approval_doc__isnull=False,
+        hod_police_approval_doc__isnull=False,
+        hod_redcross_approval_doc__isnull=False,
+        hod_fire_status__in=["Approved", "Rejected"],       
+        hod_police_status__in=["Approved", "Rejected"],        
+        hod_redcross_status__in=["Approved", "Rejected"],        
+        status='Pending'
+    ).order_by('-submitted_at')
+
+    return render(request, 'dc/dc_processed_request.html', {
+        'applications': applications,
+        'role': 'DC',
+        'dashboard_type': 'Processed Requests'
+    })
+
 
 @login_required
 @role_required(['DC'])
@@ -110,6 +153,9 @@ def register_user(request):
         otp_input = request.POST.get('otp')
         try:
             user = CustomUserProfile.objects.get(email=email)
+            if user.role != 'USER':
+                messages.error(request, "Invalid User. If you are HOD please use the HOD login")
+                return redirect('register')
         except:
             pass
 
@@ -441,6 +487,8 @@ def dc_process_application(request, app_id):
         application.status = status
         application.dc_approval_doc = approval_doc
         application.dc_comment = comment
+        from datetime import datetime
+        application.dc_approved_at= datetime.now() 
         application.save()
         messages.success(request, "Application processed successfully.")
         return redirect('dc_dashboard')
