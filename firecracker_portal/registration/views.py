@@ -110,9 +110,9 @@ def dc_processed_requests(request):
         hod_fire_status__in=["Approved", "Rejected"],       
         hod_police_status__in=["Approved", "Rejected"],        
         hod_redcross_status__in=["Approved", "Rejected"],        
-        status='Pending'
+        status__in=["Approved", "Rejected"]
     ).order_by('-submitted_at')
-
+    print(applications)
     return render(request, 'dc/dc_processed_request.html', {
         'applications': applications,
         'role': 'DC',
@@ -155,7 +155,7 @@ def register_user(request):
             user = CustomUserProfile.objects.get(email=email)
             if user.role != 'USER':
                 messages.error(request, "Invalid User. If you are HOD please use the HOD login")
-                return redirect('register')
+                return redirect('register') 
         except:
             pass
 
@@ -432,13 +432,13 @@ def process_application(request, app_id):
     (role, full_name) = [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
     # Map role to fields
     role_fields = {
-        'DC': ('dc_comment', 'dc_approval_doc', 'dc_status'),
-        'HOD_FIRE': ('hod_fire_comment', 'hod_fire_approval_doc', 'hod_fire_status'),
-        'HOD_REDCROSS': ('hod_redcross_comment', 'hod_redcross_approval_doc', 'hod_redcross_status'),
-        'HOD_POLICE': ('hod_police_comment', 'hod_police_approval_doc', 'hod_police_status'),
+         'HOD_FIRE': ('hod_fire_comment', 'hod_fire_approval_doc', 'hod_fire_status', 'hod_fire_approved_at'),
+        'HOD_REDCROSS': ('hod_redcross_comment', 'hod_redcross_approval_doc', 'hod_redcross_status', 'hod_redcross_approved_at'),
+        'HOD_POLICE': ('hod_police_comment', 'hod_police_approval_doc', 'hod_police_status', 'hod_police_approved_at'),
+        'DC': ('dc_comment', 'dc_approval_doc', 'status', 'dc_approved_at'),
     }
 
-    comment_field, doc_field, status_field = role_fields[role]
+    comment_field, doc_field, status_field,time_field = role_fields[role]
 
     if request.method == 'POST':
         # Check if application is in pending state
@@ -459,9 +459,9 @@ def process_application(request, app_id):
             
         setattr(application, comment_field, comment)
         setattr(application, status_field, status)
+        setattr(application, time_field, timezone.now())
         if approval_doc:
             setattr(application, doc_field, approval_doc)
-
         application.save()
         messages.success(request, "Review submitted successfully.")
         return redirect('hod_dashboard')
@@ -494,6 +494,30 @@ def dc_process_application(request, app_id):
         return redirect('dc_dashboard')
 
     return render(request, 'dc/dc_process_application.html', {
+        'application': application,
+        'role': full_name,
+        'actual_role':role
+    })
+@login_required
+@role_required(['DC'])
+def dc_process_end(request, app_id):
+    application = get_object_or_404(StallApplication, id=app_id)
+    user = request.user
+    profile = CustomUserProfile.objects.get(username=user)
+    (role, full_name) = [(role, full_name) for (role, full_name) in profile.ROLE_CHOICES if role == profile.role][0]
+
+    if request.method == 'POST':            
+        comment = request.POST.get('comment')
+        approval_doc = request.FILES.get('approval_doc')
+        status = request.POST.get('status')
+        application.status = status
+        application.dc_approval_doc = approval_doc
+        application.dc_comment = comment
+        application.save()
+        messages.success(request, "Application finalized successfully.")
+        return redirect('dc_dashboard')
+
+    return render(request, 'dc/dc_process_end.html', {
         'application': application,
         'role': full_name,
         'actual_role':role

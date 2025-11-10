@@ -11,6 +11,7 @@
         <th>Fire</th>
         <th>Police</th>
         <th>Red Cross</th>
+        <th>Status</th>
         <th>Process</th>
         <th>Submitted At</th>
       </tr>
@@ -24,10 +25,11 @@
         <td><span class="badge bg-success">Reviewed</span></td>
         <td><span class="badge bg-success">Reviewed</span></td>
         <td><span class="badge bg-success">Reviewed</span></td>
+        <td>{{ app.status }} </td>
         <td>
           <a
             class="btn btn-sm btn-success"
-            href="{% url 'dc_processed_requests' app.id %}"
+            href={%url "dc_process_end" app.id %}
             >Processed applications</a
           >
         </td>

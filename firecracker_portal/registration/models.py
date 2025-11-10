@@ -44,15 +44,18 @@ class StallApplication(models.Model):
     hod_fire_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     hod_fire_comment = models.TextField(blank=True, null=True)
     hod_fire_approval_doc = models.FileField(upload_to='approvals/fire/', blank=True, null=True)
+    hod_fire_approved_at = models.DateTimeField(blank=True, null=True)  
 
     hod_redcross_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     hod_redcross_comment = models.TextField(blank=True, null=True)
     hod_redcross_approval_doc = models.FileField(upload_to='approvals/redcross/', blank=True, null=True)
+    hod_redcross_approved_at = models.DateTimeField(blank=True, null=True)
 
     hod_police_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     hod_police_comment = models.TextField(blank=True, null=True)
     hod_police_approval_doc = models.FileField(upload_to='approvals/police/', blank=True, null=True)
-
+    hod_police_approved_at = models.DateTimeField(blank=True, null=True)
+    
     def __str__(self):
         return f"{self.stall_name} ({self.user.email})"
 
