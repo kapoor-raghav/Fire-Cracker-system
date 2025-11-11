@@ -52,6 +52,7 @@ def user_logout(request):
 def dc_forward_application(request, app_id):
     application = get_object_or_404(StallApplication, id=app_id)
     application.status="Pending"
+    application.dc_forwarded_at=timezone.now()
     application.save()
     messages.success(request, "Application forwarded to all HODs")
     return redirect('dc_fresh_requests')
@@ -412,7 +413,7 @@ def hod_processed_requests(request):
     field = role.lower() + '_status'
     applications = StallApplication.objects.filter(
             status='Pending', 
-            # **(Double-star) can be used to put variable as a key, instead of fixed key inside the model
+            # **(Double-star) can be used to put variable as a key, instead of fixed key inside the model.
             **{field + '__in': ["Approved", "Rejected"]}            
             ).order_by('-submitted_at')
     
@@ -517,8 +518,15 @@ def dc_process_end(request, app_id):
         messages.success(request, "Application finalized successfully.")
         return redirect('dc_dashboard')
 
+    if application.hod_fire_approved_at and application.hod_police_approved_at and application.hod_redcross_approved_at:
+        max_hod_approval_date = max(application.hod_fire_approved_at, application.hod_police_approved_at, application.hod_redcross_approved_at)
+
+    else:
+        messages.error(request, "Approval date for HODs is not valid")
+        return redirect('dc_processed_requests')
     return render(request, 'dc/dc_process_end.html', {
         'application': application,
         'role': full_name,
-        'actual_role':role
+        'actual_role':role,
+        'max_date': max_hod_approval_date
     })

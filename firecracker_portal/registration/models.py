@@ -39,6 +39,7 @@ class StallApplication(models.Model):
 #  Departmental review fields
     dc_comment = models.TextField(blank=True, null=True)
     dc_approval_doc = models.FileField(upload_to='approvals/dc/', blank=True, null=True)
+    dc_forwarded_at = models.DateTimeField(blank=True, null=True)
     dc_approved_at = models.DateTimeField(blank=True, null=True)
 
     hod_fire_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')

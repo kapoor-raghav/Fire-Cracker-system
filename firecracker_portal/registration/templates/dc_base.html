@@ -27,12 +27,12 @@
               >
               <a
                 href="{% url 'dc_finalize_requests' %}"
-                class="btn btn-outline-success {% if dashboard_type == 'Finalize Requests' %}active{% endif %}"
+                class="btn btn-outline-success me-2 {% if dashboard_type == 'Finalize Requests' %}active{% endif %}"
                 >Finalize Requests</a
               >
               <a
                 href="{% url 'dc_processed_requests' %}"
-                class="btn btn-outline-secondary {% if dashboard_type == 'Processed Requests' %}active{% endif %}"
+                class="btn btn-outline-secondary me-2 {% if dashboard_type == 'Processed Requests' %}active{% endif %}"
                 >Processed Requests</a
               >
             </div>
